@@ -25,6 +25,7 @@
                     var persons = jsonData.body;
                     if ( jsonData.body ) {
                         persons.forEach(function(el){render(el)})
+                        render();
                     }
                 });
             });
@@ -39,16 +40,19 @@
         }
         
         function sendReq() {
-            stompClient.send("/app/hello", {}, JSON.stringify({ 'name': "" }));
+            stompClient.send("/app/hello", {}, JSON.stringify({ 'reqData': "" }));
         }
-        
+
         function render(person) {
             var response = document.getElementById('response');
-            var p = document.createElement('p');
-            p.style.wordWrap = 'break-word';
-            var message = person.name + " | birthday in current month: " + person.birthday;
-            p.appendChild(document.createTextNode(message));
-            response.appendChild(p);
+            if (!person) response.appendChild(document.createElement('span')).textContent = "Response received at: " + new Date();
+            else {
+                var p = document.createElement('p');
+                p.style.wordWrap = 'break-word';
+                var message = person.name + " | birthday in current month: " + person.birthday;
+                p.appendChild(document.createTextNode(message));
+                response.appendChild(p);
+            }
         }
     </script>
 </head>

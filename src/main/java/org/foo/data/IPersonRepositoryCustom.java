@@ -12,4 +12,6 @@ public interface IPersonRepositoryCustom {
 
     Job checkJobByKey(String key, Integer month);
 
+    Job checkJobByKey(String key, Integer month, Job.Status status);
+
 }

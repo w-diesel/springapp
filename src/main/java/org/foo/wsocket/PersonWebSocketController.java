@@ -43,7 +43,7 @@ public class PersonWebSocketController {
 
         while (true) {
             Thread.sleep(1000);
-            job = personRepositoryCustom.checkJobByKey(ID, month);
+            job = personRepositoryCustom.checkJobByKey(ID, month, Job.Status.DONE);
             log.debug(" sleeping for 1 sec " + job);
             if ( job !=null && job.getStatus().equals(Job.Status.DONE) ) break;
         }

@@ -77,7 +77,15 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
 
     @Override
     public Job checkJobByKey(String key, Integer month) {
+        return checkJobByKey(key, month, null);
+    }
+
+    @Override
+    public Job checkJobByKey(String key, Integer month, Job.Status status) {
         Query searchQuery = new Query(Criteria.where("key").is(key));
+        if (status != null) {
+            searchQuery.addCriteria(Criteria.where("status").is(status));
+        }
         return mongoOps.findOne(searchQuery, Job.class);
     }
 
