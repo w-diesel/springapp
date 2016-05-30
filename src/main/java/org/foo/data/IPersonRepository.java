@@ -10,4 +10,6 @@ public interface IPersonRepository extends MongoRepository<Person, String> {
 
     List<Person> findByLastName(@Param("q") String lastName);
 
+    List<Person> findByFirstName(@Param("q") String firstName);
+
 }

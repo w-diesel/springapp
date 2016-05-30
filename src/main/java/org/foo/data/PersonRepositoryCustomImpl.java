@@ -5,6 +5,9 @@ import org.foo.data.models.Job;
 import org.foo.data.models.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.util.Formatter;
@@ -21,16 +25,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Service
 public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
 
     final static Logger log = LoggerFactory.getLogger(PersonRepositoryCustomImpl.class);
-    private MongoTemplate mongoOps;
 
-    {
+    @Autowired
+    IPersonRepository personRepository;
+
+    @Autowired
+    Environment env;
+
+    private MongoOperations mongoOps;
+
+    @PostConstruct
+    void initMongoOps() {
         try {
-            mongoOps = new MongoTemplate(new SimpleMongoDbFactory(new MongoClient(), "test_selected"));
+            mongoOps = new MongoTemplate(new SimpleMongoDbFactory(
+                    new MongoClient(),
+                    env.getProperty("spring.data.mongodb.database"))
+            );
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -48,9 +62,10 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
         log.debug("  job stored (key): " + key);
 
         try {
-            Thread.sleep(60000);  // "heavy" task
+            if (persons == null) persons = personRepository.findAll();   // "heavy" task
+            if (persons.size() < 1000) Thread.sleep(60000);              // "heavy" task
 
-            List<Map> selected = persons.stream()
+            List<Map> selected = persons.stream().parallel()
                     .filter(person -> person.getDateOfBirth().getMonth().getValue() == month)
                     .map(person -> {
                         Map dto = new HashMap<String, String>(2);
@@ -61,6 +76,8 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
                         return dto;
                     })
                     .collect(Collectors.toList());
+
+            log.debug("  finished select of persons (stream)  job (key): " + key);
 
             Query searchQuery = new Query(Criteria.where("key").is(key));
             mongoOps.updateFirst(
@@ -90,5 +107,3 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
     }
 
 }
-
-

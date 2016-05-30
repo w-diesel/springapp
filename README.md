@@ -1,16 +1,16 @@
 # springapp
 
-- installation
-- MongoDB server must be installed (must be running on the same server(127.0.0.1) with default port)
+installation:
+
+- MongoDB server
 - JBoss/Wildfly (default settings)
 - git clone && mvn package 
 
 
-in order to fill the database, one or more POST-requests should be sended:
-
+in order to fill the database, one or more POST-requests should be send:
 
 http://localhost:8080/espring/persons   #(POST)
-  {"firstName":"max","lastName":"plank","dateOfBirth":"1982-05-1"}
+  {"firstName":"max","lastName":"plank","dateOfBirth":"1982-05-01"}
 
 http://localhost:8080/espring/persons   #(POST)
   {"firstName":"max2","lastName":"plank","dateOfBirth":"1982-05-10"}

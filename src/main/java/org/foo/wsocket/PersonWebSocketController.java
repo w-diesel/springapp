@@ -28,7 +28,7 @@ public class PersonWebSocketController {
     IPersonRepositoryCustom personRepositoryCustom;
 
     @MessageMapping("/hello")
-    @SendTo("/topic/greetings")
+    @SendTo("/topic/birthdays")
     public ResponseEntity greeting() throws Exception {
 
         Job job;

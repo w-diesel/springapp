@@ -20,7 +20,7 @@
             stompClient.connect({}, function(frame) {
                 setConnected(true);
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/greetings', function(response){
+                stompClient.subscribe('/topic/birthdays', function(response){
                     var jsonData = JSON.parse(response.body);
                     var persons = jsonData.body;
                     if ( jsonData.body ) {

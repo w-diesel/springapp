@@ -1,6 +1,5 @@
 package org.foo.rest;
 
-import org.foo.data.IPersonRepository;
 import org.foo.data.IPersonRepositoryCustom;
 import org.foo.data.models.Job;
 import org.slf4j.Logger;
@@ -27,14 +26,11 @@ public class PersonRestController {
     final static Logger log = LoggerFactory.getLogger(PersonRestController.class);
 
     @Autowired
-    IPersonRepository personRepository;
-
-    @Autowired
     IPersonRepositoryCustom personRepositoryCustom;
 
     @ResponseStatus(ACCEPTED)
     @RequestMapping(path = "init", method = GET)
-    public UUID initJob(
+    public String initJob(
             @RequestParam(required = false, name = "byMonth") Integer month
     ) {
         if (month == null) month = LocalDate.now().getMonth().getValue();
@@ -43,9 +39,9 @@ public class PersonRestController {
         log.info(" request for a search of persons' birthday within month " + month);
         log.debug(" jobId " + jobId);
 
-        personRepositoryCustom.writeSelected(jobId.toString(), personRepository.findAll(), month);
+        personRepositoryCustom.writeSelected(jobId.toString(), null, month);
 
-        return jobId;
+        return jobId.toString();
     }
 
 
