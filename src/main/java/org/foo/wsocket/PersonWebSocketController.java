@@ -19,7 +19,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Controller
 public class PersonWebSocketController {
 
-    final static Logger log = LoggerFactory.getLogger(PersonWebSocketController.class);
+    static final Logger log = LoggerFactory.getLogger(PersonWebSocketController.class);
 
     @Autowired
     IPersonRepository personRepository;
@@ -29,7 +29,7 @@ public class PersonWebSocketController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/birthdays")
-    public ResponseEntity greeting() throws Exception {
+    public ResponseEntity greeting() throws InterruptedException {
 
         Job job;
         UUID jobId = UUID.randomUUID();

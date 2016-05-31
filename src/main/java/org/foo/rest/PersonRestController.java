@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 
@@ -23,29 +24,36 @@ import static org.springframework.web.bind.annotation.RequestMethod.GET;
 @RequestMapping(path = "/persons/")
 public class PersonRestController {
 
-    final static Logger log = LoggerFactory.getLogger(PersonRestController.class);
+    static final Logger log = LoggerFactory.getLogger(PersonRestController.class);
 
     @Autowired
     IPersonRepositoryCustom personRepositoryCustom;
 
     @ResponseStatus(ACCEPTED)
-    @RequestMapping(path = "init", method = GET)
-    public String initJob(
+    @RequestMapping(path = "init", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity initJob(
             @RequestParam(required = false, name = "byMonth") Integer month
     ) {
-        if (month == null) month = LocalDate.now().getMonth().getValue();
-        UUID jobId = UUID.randomUUID();
+        ResponseEntity response;
 
-        log.info(" request for a search of persons' birthday within month " + month);
-        log.debug(" jobId " + jobId);
+        if (month != null && (month < 1 || month > 12)) {
+            response = new ResponseEntity(BAD_REQUEST);
+        } else {
+            if (month == null) month = LocalDate.now().getMonth().getValue();
+            String jobId = UUID.randomUUID().toString();
 
-        personRepositoryCustom.writeSelected(jobId.toString(), null, month);
+            log.info(" request for a search of persons' birthday within month " + month);
+            log.debug(" jobId " + jobId);
 
-        return jobId.toString();
+            personRepositoryCustom.writeSelected(jobId, null, month);
+            response = new ResponseEntity(jobId, OK);
+        }
+
+        return response;
     }
 
 
-    @RequestMapping(path = "/birthdays", method = GET)
+    @RequestMapping(path = "/birthdays", method = GET, produces = APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity getResult(
             @RequestParam(required = false, name = "byMonth") Integer month,
             @RequestParam(name = "jobId") String jobId

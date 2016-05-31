@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
 
-    final static Logger log = LoggerFactory.getLogger(PersonRepositoryCustomImpl.class);
+    static final Logger log = LoggerFactory.getLogger(PersonRepositoryCustomImpl.class);
 
     @Autowired
     IPersonRepository personRepository;
@@ -46,7 +46,7 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
                     env.getProperty("spring.data.mongodb.database"))
             );
         } catch (UnknownHostException e) {
-            e.printStackTrace();
+            log.info(e.getLocalizedMessage());
         }
     }
 
@@ -62,10 +62,10 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
         log.debug("  job stored (key): " + key);
 
         try {
-            if (persons == null) persons = personRepository.findAll();   // "heavy" task
-            if (persons.size() < 1000) Thread.sleep(60000);              // "heavy" task
+            if (persons == null) persons = personRepository.findAll(); // fetching all the data as a "long running task"
+            if (persons.size() < 1000) Thread.sleep(60000);            // or waiting for 1 minute
 
-            List<Map> selected = persons.stream().parallel()
+            List<Map> selected = persons.stream()//.parallel()
                     .filter(person -> person.getDateOfBirth().getMonth().getValue() == month)
                     .map(person -> {
                         Map dto = new HashMap<String, String>(2);
@@ -88,7 +88,7 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
             log.debug("  job is done (key): " + key);
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
     }
 

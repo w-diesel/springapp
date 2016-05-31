@@ -7,9 +7,9 @@ import java.util.List;
 @Document
 public class Job {
 
-    String key;
-    List payload;
-    Status status;
+    private String key;
+    private List payload;
+    private Status status;
 
     public Status getStatus() {
         return status;
