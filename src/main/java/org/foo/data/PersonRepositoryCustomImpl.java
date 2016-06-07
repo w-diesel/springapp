@@ -52,21 +52,31 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
 
     @Async
     @Override
-    public void writeSelected(String key, List<Person> persons, Integer month) {
+    public String initJob(String key, Integer month) {
 
-        Job job = new Job();
-        job.setKey(key);
-        job.setStatus(Job.Status.PENDING);
+        Job job = new Job(key, month);
 
         mongoOps.insert(job);
         log.debug("  job stored (key): " + key);
+        return key;
+    }
+
+
+    @Async
+    @Override
+    public void writeSelected(String key, List<Person> persons, Integer month) {
+
+        Query searchQuery = new Query(Criteria.where("key").is(key));
+        Job job = mongoOps.findOne(searchQuery, Job.class);
+
+        final Integer monthValue = job.getCriteria();
 
         try {
             if (persons == null) persons = personRepository.findAll(); // fetching all the data as a "long running task"
             if (persons.size() < 1000) Thread.sleep(60000);            // or waiting for 1 minute
 
             List<Map> selected = persons.stream()//.parallel()
-                    .filter(person -> person.getDateOfBirth().getMonth().getValue() == month)
+                    .filter(person -> person.getDateOfBirth().getMonth().getValue() == monthValue)
                     .map(person -> {
                         Map dto = new HashMap<String, String>(2);
                         int daysToBirthday = person.getDateOfBirth().getDayOfMonth() - LocalDate.now().getDayOfMonth();
@@ -78,8 +88,6 @@ public class PersonRepositoryCustomImpl implements IPersonRepositoryCustom {
                     .collect(Collectors.toList());
 
             log.debug("  finished select of persons (stream)  job (key): " + key);
-
-            Query searchQuery = new Query(Criteria.where("key").is(key));
             mongoOps.updateFirst(
                     searchQuery,
                     Update.update("payload", selected).set("status", Job.Status.DONE),
