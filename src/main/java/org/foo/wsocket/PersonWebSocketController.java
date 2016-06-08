@@ -3,6 +3,7 @@ package org.foo.wsocket;
 import org.foo.data.IPersonRepository;
 import org.foo.data.IPersonRepositoryCustom;
 import org.foo.data.models.Job;
+import org.foo.tasks.ITaskProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class PersonWebSocketController {
     static final Logger log = LoggerFactory.getLogger(PersonWebSocketController.class);
 
     @Autowired
+    ITaskProducer taskProducer;
+
+    @Autowired
     IPersonRepository personRepository;
 
     @Autowired
@@ -32,20 +36,19 @@ public class PersonWebSocketController {
     public ResponseEntity greeting() throws InterruptedException {
 
         Job job;
-        UUID jobId = UUID.randomUUID();
         final Integer month = LocalDate.now().getMonth().getValue();
-        final String ID = jobId.toString();
 
         log.info(" request for a search of persons' birthday within month " + month);
+        String jobId = taskProducer.sendTask(month, null);
         log.debug(" jobId " + jobId);
 
-        personRepositoryCustom.writeSelected(ID, personRepository.findAll(), month);
-
         while (true) {
+
             Thread.sleep(1000);
-            job = personRepositoryCustom.checkJobByKey(ID, month, Job.Status.DONE);
+            job = personRepositoryCustom.checkJobByKey(jobId, month, Job.Status.DONE);
             log.debug(" sleeping for 1 sec " + job);
             if ( job !=null && job.getStatus().equals(Job.Status.DONE) ) break;
+
         }
         return new ResponseEntity(job.getPayload(), OK);
     }

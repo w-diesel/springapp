@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IPersonRepositoryCustom {
 
-    String initJob(String key, Integer month);
+    String saveJob(String key, Integer month);
 
     void writeSelected(String key, List<Person> persons, Integer month);
 

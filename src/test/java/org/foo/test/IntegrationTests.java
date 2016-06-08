@@ -76,7 +76,7 @@ public class IntegrationTests {
     @Test//(timeout = 70000)
     public void t3_jobCheckByIdGetResponseWithData() throws InterruptedException {
 
-        log.info("/// 3.  waiting ~1 minute and trying to get result of the Tasks ");
+        log.info("/// 3.  waiting ~1 minute and trying to get result of the Tasks " + jobIdList);
 
         template.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
         Thread.sleep(61000);

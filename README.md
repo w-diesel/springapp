@@ -2,9 +2,10 @@
 
 installation:
 
+- rabbitmq
 - MongoDB server
 - JBoss/Wildfly (default settings)
-- git clone && mvn package 
+- git clone && mvn clean package
 
 
 in order to fill the database, one or more POST-requests should be send:
@@ -16,7 +17,7 @@ http://localhost:8080/espring/persons   #(POST)
   {"firstName":"max2","lastName":"plank","dateOfBirth":"1982-05-10"}
 
 http://localhost:8080/espring/persons   #(POST)
-  {"firstName":"max3","lastName":"plank","dateOfBirth":"1982-05-30"}
+  {"firstName":"max3","lastName":"plank","dateOfBirth":"1982-06-30"}
 
 
 - (REST)

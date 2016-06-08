@@ -3,7 +3,6 @@ package org.foo.data.models;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,10 +10,11 @@ import java.util.List;
 public class Job {
 
     @Id
-    private String key;
+    private String key; // "_id" in MongoDb
     private List payload;
     private Status status;
-    private LocalDateTime сreationDate;
+    private LocalDateTime startTime;
+    private LocalDateTime completionTime;
     private Integer criteria;
 
     public Job() {
@@ -22,22 +22,30 @@ public class Job {
 
     public Job(String key, Integer criteria) {
         this.key = key;
-        this.status = Status.PENDING;
-        this.сreationDate = LocalDateTime.now();
         this.criteria = criteria;
+        this.status = Status.PENDING;
+        this.startTime = LocalDateTime.now();
     }
 
+
+    public LocalDateTime getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(LocalDateTime completionTime) {
+        this.completionTime = completionTime;
+    }
 
     public Integer getCriteria() {
         return criteria;
     }
 
-    public LocalDateTime getСreationDate() {
-        return сreationDate;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setСreationDate(LocalDateTime сreationDate) {
-        this.сreationDate = сreationDate;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
     public Status getStatus() {
